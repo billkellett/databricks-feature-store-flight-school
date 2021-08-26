@@ -155,16 +155,18 @@ display(inference_data_df)
 
 # COMMAND ----------
 
+# UNCOMMENT THIS IF YOU NEED IT
+
 # Temporary Developer API (proper API coming soon): manually clear out the feature table with a developer API
 # NOTE: this API call works for DBR 8.x, but not for DBR 9.x, which requires another parameter which is shrouded in mystery
 #
 # NOTE: THIS WILL FAIL if the tables do not exist... but that's OK
 
-from databricks.feature_store import FeatureStoreClient
+#from databricks.feature_store import FeatureStoreClient
 
-fs = FeatureStoreClient()
-fs._catalog_client.delete_feature_table(f"{database_name}.demographic_features")
-fs._catalog_client.delete_feature_table(f"{database_name}.service_features")
+#fs = FeatureStoreClient()
+#fs._catalog_client.delete_feature_table(f"{database_name}.demographic_features")
+#fs._catalog_client.delete_feature_table(f"{database_name}.service_features")
 
 # COMMAND ----------
 
