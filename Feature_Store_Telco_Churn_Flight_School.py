@@ -453,6 +453,16 @@ fit_model(generate_all_lookups(service_features_table) + generate_all_lookups(de
 
 # COMMAND ----------
 
+# If you hit Run All, you will stop here.  
+# This allows you to examine all artifacts before anything is deleted in the cell below.
+# But don't forget to run the cell below, or you'll have a lot of manual cleanup to do!
+
+dbutils.notebook.exit(0)
+
+# COMMAND ----------
+
+NONONO ORIGINAL DO NOT RUN
+
 from databricks.feature_store.online_store_spec import AmazonRdsMySqlSpec
 from databricks.feature_store import FeatureStoreClient
 
@@ -467,6 +477,23 @@ online_store = AmazonRdsMySqlSpec(hostname, port, user, password)
 
 fs.publish_table(name='oetrta.demographic_features', online_store=online_store)
 fs.publish_table(name='oetrta.service_features', online_store=online_store)
+
+# COMMAND ----------
+
+from databricks.feature_store.online_store_spec import AmazonRdsMySqlSpec
+from databricks.feature_store import FeatureStoreClient
+
+fs = FeatureStoreClient()
+
+hostname = "198.71.225.50" 
+port = 3306 
+user = "BKMySQL" 
+password = "ownerMySQL!#1"
+
+online_store = AmazonRdsMySqlSpec(hostname, port, user, password)
+
+fs.publish_table(name=f'BK-MYSQL-SHARE-02.demographic_features', online_store=online_store)
+fs.publish_table(name=f'BK-MYSQL-SHARE-02.service_features', online_store=online_store)
 
 # COMMAND ----------
 
