@@ -1,15 +1,18 @@
 # Databricks notebook source
-# This creates the "user_email" field displayed at the top of the notebook.
-
-dbutils.widgets.text("user_email", "Enter your email address");
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC <img src="https://drive.google.com/uc?id=1-T_-28nMLT3YW9uiDl1hljv7dEZqmcv5" width=100/>
 # MAGIC ### Before you begin...
 # MAGIC 
-# MAGIC Please __enter your email address__ or some other unique text string into the *user_email* text field above.  We use this to ensure that each Workshop user has unique file paths and a unique database name.  This allows multiple users to participate in the Workshop without stepping on each other's data, even if multiple users are logged in to Databricks with the same user ID.
+# MAGIC __Run the cell below__ in order to create a text entry "widget" at the top of the screen.
+# MAGIC   - To run a cell, click in the cell, then click the triangle on the upper right of the cell and choose "Run Cell" - alternatively, you can use SHIFT+ENTER.
+# MAGIC 
+# MAGIC Then, please __enter your email address__ or some other unique text string into the *user_email* text field above.  We use this to ensure that each Workshop user has unique file paths and a unique database name.  This allows multiple users to participate in the Workshop without stepping on each other's data, even if multiple users are logged in to Databricks with the same user ID.
+
+# COMMAND ----------
+
+# This creates the "user_email" field displayed at the top of the notebook.
+
+dbutils.widgets.text("user_email", "Enter your email address");
 
 # COMMAND ----------
 
