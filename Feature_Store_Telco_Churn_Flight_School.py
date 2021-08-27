@@ -28,6 +28,14 @@ dbutils.widgets.text("user_email", "Enter your email address");
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC <img src="https://drive.google.com/uc?id=1uijNFQAln27ziVK4FtQdNh_MH0_upOoG" width=100/>
+# MAGIC ### Please NOTE...
+# MAGIC 
+# MAGIC Currently, this notebook __*must*__ run on an 8.x ML cluster (single-node is fine).  It calls a temporary development API to delete Feature Store tables, and the signature of this API call does not work on 9.x.
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC <img src="https://drive.google.com/uc?id=1-T_-28nMLT3YW9uiDl1hljv7dEZqmcv5" width=100/>
 # MAGIC ### Before you proceed...
 # MAGIC 
@@ -158,18 +166,16 @@ display(inference_data_df)
 
 # COMMAND ----------
 
-# UNCOMMENT THIS IF YOU NEED IT
-
 # Temporary Developer API (proper API coming soon): manually clear out the feature table with a developer API
 # NOTE: this API call works for DBR 8.x, but not for DBR 9.x, which requires another parameter which is shrouded in mystery
 #
-# NOTE: THIS WILL FAIL if the tables do not exist... but that's OK
+# NOTE: THIS WILL FAIL if the tables do not exist... but that's OK... just continue with the demo
 
-#from databricks.feature_store import FeatureStoreClient
+from databricks.feature_store import FeatureStoreClient
 
-#fs = FeatureStoreClient()
-#fs._catalog_client.delete_feature_table(f"{database_name}.demographic_features")
-#fs._catalog_client.delete_feature_table(f"{database_name}.service_features")
+fs = FeatureStoreClient()
+fs._catalog_client.delete_feature_table(f"{database_name}.demographic_features")
+fs._catalog_client.delete_feature_table(f"{database_name}.service_features")
 
 # COMMAND ----------
 
@@ -453,47 +459,23 @@ fit_model(generate_all_lookups(service_features_table) + generate_all_lookups(de
 
 # COMMAND ----------
 
-# If you hit Run All, you will stop here.  
-# This allows you to examine all artifacts before anything is deleted in the cell below.
-# But don't forget to run the cell below, or you'll have a lot of manual cleanup to do!
+# This cell is commented because it is cumbersome in a large-group Flight School setting.  
+# If it is of interest to you, we leave it as "an exercise for the reader."
 
-dbutils.notebook.exit(0)
+#from databricks.feature_store.online_store_spec import AmazonRdsMySqlSpec
+#from databricks.feature_store import FeatureStoreClient
 
-# COMMAND ----------
+#fs = FeatureStoreClient()
 
-NONONO ORIGINAL DO NOT RUN
+#hostname = "oetrta-mysql.cmeifwaki1jl.us-west-2.rds.amazonaws.com" # dbutils.secrets.get("oetrta", "mysql-hostname")
+#port = 3306 # int(dbutils.secrets.get("oetrta", "mysql-port"))
+#user = "oetrtaadmin" # dbutils.secrets.get("oetrta", "mysql-username")
+#password = dbutils.secrets.get("oetrta", "mysql-password")
 
-from databricks.feature_store.online_store_spec import AmazonRdsMySqlSpec
-from databricks.feature_store import FeatureStoreClient
+#online_store = AmazonRdsMySqlSpec(hostname, port, user, password)
 
-fs = FeatureStoreClient()
-
-hostname = "oetrta-mysql.cmeifwaki1jl.us-west-2.rds.amazonaws.com" # dbutils.secrets.get("oetrta", "mysql-hostname")
-port = 3306 # int(dbutils.secrets.get("oetrta", "mysql-port"))
-user = "oetrtaadmin" # dbutils.secrets.get("oetrta", "mysql-username")
-password = dbutils.secrets.get("oetrta", "mysql-password")
-
-online_store = AmazonRdsMySqlSpec(hostname, port, user, password)
-
-fs.publish_table(name='oetrta.demographic_features', online_store=online_store)
-fs.publish_table(name='oetrta.service_features', online_store=online_store)
-
-# COMMAND ----------
-
-from databricks.feature_store.online_store_spec import AmazonRdsMySqlSpec
-from databricks.feature_store import FeatureStoreClient
-
-fs = FeatureStoreClient()
-
-hostname = "198.71.225.50" 
-port = 3306 
-user = "BKMySQL" 
-password = "ownerMySQL!#1"
-
-online_store = AmazonRdsMySqlSpec(hostname, port, user, password)
-
-fs.publish_table(name=f'BK-MYSQL-SHARE-02.demographic_features', online_store=online_store)
-fs.publish_table(name=f'BK-MYSQL-SHARE-02.service_features', online_store=online_store)
+#fs.publish_table(name='oetrta.demographic_features', online_store=online_store)
+#fs.publish_table(name='oetrta.service_features', online_store=online_store)
 
 # COMMAND ----------
 
@@ -515,15 +497,6 @@ fs.publish_table(name=f'BK-MYSQL-SHARE-02.service_features', online_store=online
 # COMMAND ----------
 
 inference_data_df.join(service_df, "customerID").write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.telco_automl")
-
-# COMMAND ----------
-
-# DBTITLE 1,Prevent "Run All" from running the cells below and deleting things
-# If you hit Run All, you will stop here.  
-# This allows you to examine all artifacts before anything is deleted in the cell below.
-# But don't forget to run the cell below, or you'll have a lot of manual cleanup to do!
-
-dbutils.notebook.exit(0)
 
 # COMMAND ----------
 
@@ -553,10 +526,10 @@ client = mlflow.tracking.MlflowClient()
 
 # COMMAND ----------
 
-# DBTITLE 1,Clean up the MLflow Registry if you are done with it
+# DBTITLE 1,Delete the MLflow Runs if you are done with them
 # Cleanup... 
 # Don't forget to run this cell, or you will have a lot of manual cleanup to do!
-# NOTE: if you have Registered any of these models, you will have to un-register them before running this cell
+# NOTE: if you have Registered any of these models as Staging or Production, you will have to un-register them before running this cell
 
 import mlflow
 import time
@@ -584,7 +557,7 @@ print("... all runs deleted.")
 
 # COMMAND ----------
 
-# DBTITLE 1,Be sure to run this cleanup!
+# DBTITLE 1,Delete the Delta Lake Database, DBFS File Path, and Local File Path if you are done with them
 # Cleanup... 
 # Don't forget to run this cell, or you will have a lot of manual cleanup to do!
 # Remove all data resources: local data path, dbfs data path, and Delta Lake database
